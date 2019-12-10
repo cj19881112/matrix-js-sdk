@@ -1516,6 +1516,7 @@ Crypto.prototype._requestVerificationWithChannel = async function(
             } else {
                 map.set(name, method);
             }
+            return map;
         }, new Map());
     }
     const request = new VerificationRequest(
@@ -2435,6 +2436,8 @@ Crypto.prototype._onKeyVerificationMessage = function(event) {
  * @param {module:models/event.MatrixEvent} event the timeline event
  */
 Crypto.prototype._onTimelineEvent = function(event) {
+    // TODO: we still need a request object for past requests, so we can show it in the timeline
+    // validation now excludes old requests
     if (!InRoomChannel.validateEvent(event, this._baseApis)) {
         return;
     }
@@ -2469,7 +2472,6 @@ Crypto.prototype._handleVerificationEvent = async function(
         if (!request) {
             return;
         }
-        event.setVerificationRequest(request);
         isNewRequest = true;
         if (!requestsByTxnId) {
             requestsByTxnId = new Map();
@@ -2477,6 +2479,7 @@ Crypto.prototype._handleVerificationEvent = async function(
         }
         requestsByTxnId.set(transactionId, request);
     }
+    event.setVerificationRequest(request);
     try {
         const hadVerifier = !!request.verifier;
         await request.channel.handleEvent(event, request);
