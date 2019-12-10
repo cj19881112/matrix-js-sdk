@@ -2469,6 +2469,7 @@ Crypto.prototype._handleVerificationEvent = async function(
         if (!request) {
             return;
         }
+        event.setVerificationRequest(request);
         isNewRequest = true;
         if (!requestsByTxnId) {
             requestsByTxnId = new Map();
