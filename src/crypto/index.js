@@ -1520,7 +1520,7 @@ Crypto.prototype._requestVerificationWithChannel = async function(
         }, new Map());
     }
     const request = new VerificationRequest(
-        channel, verificationMethods, userId, this._baseApis);
+        channel, verificationMethods, this._baseApis);
     await request.sendRequest();
 
     // TODO: we're only adding the request to the map once it has been sent
@@ -1549,7 +1549,7 @@ Crypto.prototype.beginKeyVerification = function(
         const channel = new ToDeviceChannel(
             this._baseApis, userId, [deviceId], transactionId, deviceId);
         request = new VerificationRequest(
-            channel, this._verificationMethods, userId, this._baseApis);
+            channel, this._verificationMethods, this._baseApis);
         this._toDeviceVerificationRequests.setRequestBySenderAndTxnId(
             userId, transactionId, request);
     }
@@ -2415,7 +2415,7 @@ Crypto.prototype._onKeyVerificationMessage = function(event) {
             [deviceId],
         );
         return new VerificationRequest(
-            channel, this._verificationMethods, userId, this._baseApis);
+            channel, this._verificationMethods, this._baseApis);
     };
     this._handleVerificationEvent(
         event,
@@ -2440,14 +2440,18 @@ Crypto.prototype._onTimelineEvent = function(event) {
         if (!InRoomChannel.canCreateRequest(InRoomChannel.getEventType(event))) {
             return;
         }
-        const userId = event.getSender();
+        const otherPartyUserId =
+            InRoomChannel.getOtherPartyUserId(event, this._baseApis);
+        if (!otherPartyUserId) {
+            return;
+        }
         const channel = new InRoomChannel(
             this._baseApis,
             event.getRoomId(),
-            userId,
+            otherPartyUserId,
         );
         return new VerificationRequest(
-            channel, this._verificationMethods, userId, this._baseApis);
+            channel, this._verificationMethods, this._baseApis);
     };
     this._handleVerificationEvent(
         event,
